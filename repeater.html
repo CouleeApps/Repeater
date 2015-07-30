@@ -103,7 +103,7 @@ RepeaterGame.prototype.init = function() {
 	this.start();
 }
 RepeaterGame.prototype.start = function() {
-	this.target = Math.ceil(Math.random() * 8) + 2;
+	this.target = Math.ceil(Math.random() * 12) + 1;
 	this.chars = 0;
 	message.innerHTML = "Hold for " + this.target;
 	score.innerHTML = "Score: " + this.score;
