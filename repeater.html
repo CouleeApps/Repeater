@@ -42,6 +42,15 @@ body {
 	box-shadow: 0 0 20px #888;
 	padding: 10px 20px;
 }
+#score {
+	font-size: 64px;
+	border: 1px solid #888;
+	border-radius: 10px;
+	margin-top: 100px;
+	display: inline-block;
+	box-shadow: 0 0 20px #888;
+	padding: 10px 20px;
+}
 #entry {
 	font-size: 64px;
 	letter-spacing: 10px;
@@ -63,11 +72,12 @@ body {
 </head>
 <body>
 	<div id="game">
-		<button id="start" onclick="Game.start();"></button>
+		<button id="start" onclick="Game.init();"></button>
 		<div id="message">Enter to Start</div>
 		<div id="container">
 			<div id="entry"></div>
 		</div>
+		<div id="score">High Score</div>
 	</div>
 	<script type="text/javascript">
 
@@ -75,6 +85,7 @@ entry = document.getElementById("entry");
 message = document.getElementById("message");
 container = document.getElementById("container");
 start = document.getElementById("start");
+score = document.getElementById("score");
 
 function RepeaterGame() {
 	this.running = false;
@@ -82,24 +93,46 @@ function RepeaterGame() {
 	this.looping = false;
 	this.loopId = 0;
 	this.chars = 0;
+	this.score = 0;
+}
+RepeaterGame.prototype.init = function() {
+	this.score = 0;
+	this.start();
 }
 RepeaterGame.prototype.start = function() {
 	this.target = Math.ceil(Math.random() * 8) + 2;
 	this.chars = 0;
 	message.innerHTML = "Hold for " + this.target;
+	score.innerHTML = "Score: " + this.score;
 	this.running = true;
+	this.looping = false;
 	entry.innerHTML = "";
 	this.updateState("start");
 }
 RepeaterGame.prototype.success = function() {
-	message.innerHTML = "Enter to Retry";
-	this.updateState("success");
-	this.running = false;
+	clearTimeout(this.loopId);
+	this.score ++;
+
+	if (typeof(localStorage.highscore) === "undefined" || this.score > localStorage.highscore)
+		localStorage.highscore = this.score;
+
+	this.start();
 }
 RepeaterGame.prototype.failure = function() {
 	message.innerHTML = "Enter to Retry";
 	this.updateState("failure");
 	this.running = false;
+
+	if (typeof(localStorage.highscore) === "undefined" || this.score > localStorage.highscore)
+		localStorage.highscore = this.score;
+
+	this.showHighscore(true);
+}
+RepeaterGame.prototype.showHighscore = function(showScore) {
+	var highscore = localStorage.highscore;
+	if (typeof(localStorage.highscore) === "undefined")
+		highscore = 0;
+	score.innerHTML = (showScore ? "Score: " + this.score + " " : "") + "High Score: " + highscore;
 }
 RepeaterGame.prototype.pressed = function(code) {
 	entry.innerHTML += "&bull;";
@@ -137,7 +170,7 @@ RepeaterGame.prototype.onkeyup = function(e) {
 	if (e.keyCode == 13) { //Enter
 		if (this.running)
 			return;
-		this.start();
+		this.init();
 		return;
 	}
 	if (e.keyCode < 0x20) {
@@ -154,13 +187,14 @@ RepeaterGame.prototype.onkeyup = function(e) {
 
 //Updated success / start state
 RepeaterGame.prototype.updateState = function(state) {
-	[document.body, entry, message, container, start].forEach(function(control) {
+	[document.body, entry, message, container, start, score].forEach(function(control) {
 		control.setAttribute("class", state);
 	});
 }
 
 //Create the game
 Game = new RepeaterGame();
+Game.showHighscore(false);
 
 //Document event bindings
 document.onkeydown = function(e) {
