@@ -120,9 +120,7 @@ RepeaterGame.prototype.onkeydown = function(e) {
 	if (e.keyCode == 13) { //Enter
 		return;
 	}
-	if (!((e.keyCode > 0x40 && e.keyCode < 0x5b) || //A-Z
-	      (e.keyCode > 0x60 && e.keyCode < 0x7b) || //a-z
-	      (e.keyCode > 0x30 && e.keyCode < 0x39))) {//0-9
+	if (e.keyCode < 0x20) {
 		return;
 	}
 	if (this.running) {
@@ -142,9 +140,7 @@ RepeaterGame.prototype.onkeyup = function(e) {
 		this.start();
 		return;
 	}
-	if (!((e.keyCode > 0x40 && e.keyCode < 0x5b) || //A-Z
-	      (e.keyCode > 0x60 && e.keyCode < 0x7b) || //a-z
-	      (e.keyCode > 0x30 && e.keyCode < 0x39))) {//0-9
+	if (e.keyCode < 0x20) {
 		return;
 	}
 	if (this.running) {
